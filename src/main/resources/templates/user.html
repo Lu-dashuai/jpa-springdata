@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>user</title>
+    <script src="../js/vue.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+    <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/popper.js/1.12.5/umd/popper.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+    <script src="../js/axios.min.js"></script>
+</head>
+<body>
+<h1>userList</h1>
+<div id="app">
+    <div class="row mx-auto w-75">
+        <div class="col-6">
+            <div class="btn-group">
+                <!--按钮-->
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+                    新增
+                </button>
+                <!--弹出框-->
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+                     aria-labelledby="exampleModalLabel">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+
+                            <div class="modal-header">
+                                <h4>新增</h4>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                                        aria-hidden="true">&times;</span></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="/user/save" method="post" :model="formData">
+                                    <div class="form-group">
+                                        <label class="control-label">姓名:</label>
+                                        <input type="text" class="form-control" name="name" v-model="formData.name">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">年龄:</label>
+                                        <input type="text" class="form-control" name="age" v-model="formData.age">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">地址:</label>
+                                        <input type="text" class="form-control" name="address"
+                                               v-model="formData.address">
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                <button type="button" class="btn btn-primary" @click="insert">新增</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-6">
+            <div class="input-group">
+                <input type="text" class="form-control input-group-sm" placeholder="输入设备编号进行搜索">
+                <span class="input-group-btn">
+                        <button class="btn btn-default" type="button"><i class="fa fa-search"></i></button>
+                </span>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row mx-auto w-75">
+        <div class="col-12">
+            <table class="table table-hover table-success" >
+                <thead class="thead-default">
+                <tr>
+                    <th>id</th>
+                    <th>姓名</th>
+                    <th>年龄</th>
+                    <th>地址</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="(user,index) in tableData" >
+                    <td>{{user.id}}</td>
+                    <td>{{user.name}}</td>
+                    <td>{{user.age}}</td>
+                    <td>{{user.address}}</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</body>
+
+<script>
+
+    new Vue({
+        el: "#app",
+        data: {
+            tableData: [],
+            //提交的表单数据
+            formData: {
+                name: '',
+                age: '',
+                address: ''
+            }
+        },
+        methods: {
+            //将模态框数据插入表中
+            insert: function () {
+                const self = this;
+                const User = {
+                    'name': this.formData.name,
+                    'age': this.formData.age,
+                    'address': this.formData.address
+                };
+                axios.post('/user/save', User).then(function (response) {
+                    if (response != null || response != '') {
+                        alert('添加成功');
+                        self.closes();
+                    }
+                })
+            },
+            //关闭模态框
+            closes: function () {
+                $('#exampleModal').modal('hide');
+            }
+        },
+        created:function () {
+            const self = this;
+            axios.post('/user/page',{'pageNo':1,'pageSize':2}).then(function (res) {
+                alert(JSON.stringify(res.data.content))
+                self.tableData = res.data.content;
+            })
+        }
+    })
+
+</script>
+</html>
